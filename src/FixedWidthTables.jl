@@ -3,9 +3,10 @@ module FixedWidthTables
 
 convert_val(::Type{<:AbstractString},   val::AbstractString) = val  # e.g. SubString in case it is needed as-is
 convert_val(::Type{String},             val::AbstractString) = string(val)
+convert_val(::Type{Char},               val::AbstractString) = only(val)
 convert_val(::Type{Symbol},             val::AbstractString) = Symbol(val)
 convert_val(typ::Type{<:Integer},       val::AbstractString) = parse(typ, val)
-convert_val(typ::Type{<:AbstractFloat}, val::AbstractString) = parse(typ, replace(val, "D" => "E"))
+convert_val(typ::Type{<:AbstractFloat}, val::AbstractString) = parse(typ, replace(val, 'D' => 'E'))
 
 test_match(target::String,   s::AbstractString) = s == target
 test_match(target::Regex,    s::AbstractString) = occursin(target, s)
