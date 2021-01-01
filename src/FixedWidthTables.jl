@@ -13,10 +13,10 @@ test_match(target::Function, s::AbstractString) = target(s)
 
 
 function read(io, colspecs::NamedTuple;
-        skiprows=[], missings=[], strip_chars=[' '],
+        skiprows=[], skiprows_startwith=[], missings=[], strip_chars=[' '],
         allow_shorter_lines=false, allow_overlap=false, restrict_remaining_chars=nothing)
     lines = eachline(io)
-    ixlines = filter(((i, line),) -> i ∉ skiprows, enumerate(lines) |> collect)
+    ixlines = filter(((i, line),) -> i ∉ skiprows && !any(startswith.(line, skiprows_startwith)), enumerate(lines) |> collect)
 
     max_used_index = maximum(((rng, typ),) -> maximum(rng), colspecs)
     used_chars = zeros(Bool, max_used_index)
