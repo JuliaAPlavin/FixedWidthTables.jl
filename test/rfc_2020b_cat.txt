@@ -1,0 +1,204 @@
+# VLBI SOURCE POSITION CATALOGUE  Format version of 2010.09.11 
+# Catalogue was created by Leonid Petrov ( lpetrov@astrogeo.fios-router.home )
+#                       at 2020.07.02-21:08:43
+#                          with using program rfc_outcat version of 2020.01.05
+#
+# This catalogue contains source positions and estimates of flux density from
+# reanalysis of VLBI experiments under absolute astrometry and geodesy
+# programs at the VLBA, LBA, EVN, and CVN in 1994-2020, as well as other VLBI
+# experiments under geodesy and absolute astrometry since 1980.04.11 through
+# 2020.06.15, in total 7451 experiments.
+# In total, 18.5 million values of group delays were used in the solution.
+#
+# Home page: http://astrogeo.org/vlbi/solutions/rfc_2020b
+#            ============================================
+#
+# If you use positions and/or estimates of correlated flux densities
+# from this catalogue in your work, for example, for scheduling phase
+# referencing observations, you are encouraged to include in your paper
+# references to original publications:
+#
+#  1) Beasley, A.J., Gordon, D., Peck, A.B., Petrov, L., MacMillan, D.S.,
+#        Fomalont, E.B., & Ma, C., The VLBA Calibrator Survey - VCS1, 2002,
+#        Astrophys. J. Sup., 141, 13
+#
+#  2) Fomalont, E., Petrov, L., McMillan, D.S., Gordon, D., Ma, C.,
+#        The Second VLBA Calibrator Survery: VCS2, 2003, Astron. J., 126, 2562
+#
+#  3) Petrov, L., Kovalev, Yu.Y., Fomalont, E., and Gordon, D.,
+#        The Third VLBA Calibrator Survey -- VCS3, Astron. J., 2005, 129, 1163
+#
+#  4) Petrov, L., Kovalev, Yu.Y., Fomalont, E., and Gordon, D.,
+#        The Fourth VLBA Calibrator Survey -- VCS4, Astron. J., 2006, 131, 1872
+#
+#  5) Kovalev, Yu.Y., Petrov, L., Fomalont, E., and Gordon, D.,
+#        The Fifth VLBA Calibrator Survey -- VCS5, Astron. J., 2007, 133, 1236
+#
+#  6) Petrov, L., Kovalev, Yu.Y., Fomalont, E., and Gordon, D.,
+#        The Sixth VLBA Calibrator Survey -- VCS6, Astron. J., 2008, 136, 580
+#
+#  7) Petrov, L., Phillips, C., Bertarini, A., Murphy, T., Sadler, E.M,
+#     The LBA Calibrator Survey of southern compact extragalactic
+#     radio sources --- LCS1, Mon. Not. of Roy. Astron. Soc.,
+#     2011, 414(3), 2528-2539
+#
+#  8) Petrov, L., Kovalev, Y.Y., Fomalont, E.B., Gordon, D. "The VLBA Galactic
+#        Plane Survey --- VGaPS", Astron J, 2011, 142, 35
+#
+#  9) Kovalev, Y.Y., Petrov, L., Gordon, D. Fomalont, E.B., "The Northern Polar
+#        Cap VLBI survey", to be submitted to AJ, 2011
+#
+# 10) Immer, K., Brunthaler, A., Reid, M. J., Bartkiewicz, A., Choi, Y. K.,
+#        Menten, K. M., Moscadelli, L., Sanna, A., Wu, Y. W., Xu, Y.,
+#        Zhang, B., Zheng, X. W., The VLBA Calibrator Search for the BeSSeL
+#        Survey, ApJS, vol., 194, 25
+#
+# 11) Petrov, L., Taylor, G., Precise absolute astrometry from the VLBA
+#        imaging and polarimetry survey at 5 GHz, Astron. J., 2011, 142, 89
+#
+# 12) Petrov, L., The catalogue of positions of optically bright extragalactic
+#        radio sources OBRS-1, 2011, Astron. J., 142, 105
+#
+# 13) Petrov, L., The catalogue of positions of optically bright extragalactic
+#        radio sources OBRS-2, 2013, Astron. J., 146, 5
+#
+# 14) Petrov, L., "The EVN Galactic Plane Survey --- EGaPS",
+#     MNRAS, 2012, 416, 1097-1105
+#
+# 15) Gordon D., C. Jacobs , A. Beasley , A. Peck , R. Gaume , P. Charlot,
+#       A. Fey, C. Ma, O. Titov, D. Boboltz, "Second epoch VLBA calibrator
+#       survey observations: VCS-II", 2016, Astron. J., 151--154
+#
+# 16) Shu F., Petrov L., Jiang W., Xia B., Chen Zh., Hao L.,
+#       Liu X., Takefuji K., McCallum J., Lovell J., Yi S.-O. , and
+#       Li J., The VLBI ecliptic plane survey VEPS-1, 2017, The Astrophysical
+#       Journal Supplement Series, 230:13 (10pp).
+#
+# 17) Petrov, L., de Witt A., Sadler E. M., Phillips, C., Horiuchi S.
+#       The Second LBA Calibrator Survey of southern compact
+#       extragalactic radio sources -- LCS2, 2019, MNRAS, 485(1), 88-101.
+#
+#
+# Field    1:1    A1    Category: C (calibrator), N (non-calibrator), U (unreliable coordinates)
+# Field    4:11   A8    IVS name (B1950)
+# Field   13:22   A10   IAU name (J2000.0)
+# Field   25:26   I2    Right ascension: hours
+# Field   28:29   I2    Right ascension: minutes
+# Field   31:39   F9.6  Right ascension: seconds
+# Field   41:43   I3    Declination: degrees
+# Field   45:46   I3    Declination: minutes
+# Field   48:57   F8.5  Declination: seconds
+# Field   58:63   F6.2  Inflated error in right ascension in mas
+# Field   65:70   F6.2  Inflated error in declination in mas
+# Field   73:78   F6.3  Correlation between right ascension and declination
+# Field   80:85   I6    Number of observations used
+#
+# Field   88:88   A1    Blank or < or - for S-band total flux density integrated over entire map
+# Field   89:93   F5.3  S-band total flux density integrated over entire map,  Jy
+# Field   95:95   A1    Blank or < or - for S-band unresolved flux density at VLBA baselines, Jy
+# Field   96:100  F5.3  S-band unresolved flux density at long VLBA baselines, Jy
+#
+# Field  103:103  A1    Blank or < or - for C-band total flux density integrated over entire map
+# Field  104:108  F5.3  C-band total flux density integrated over entire map,  Jy
+# Field  110:110  A1    Blank or < or - for C-band unresolved flux density at VLBA baselines
+# Field  111:115  F5.3  C-band unresolved flux density at long VLBA baselines, Jy
+#
+# Field  118:118  A1    Blank or < or - for X-band total flux density integrated over entire map
+# Field  119:123  F5.3  X-band total flux density integrated over entire map,  Jy
+# Field  125:125  A1    Blank or < or - for X-band unresolved flux density at VLBA baselines
+# Field  126:130  F5.3  X-band unresolved flux density at long VLBA baselines, Jy
+#
+# Field  133:133  A1    Blank or < or - for U-band total flux density integrated over entire map
+# Field  134:138  F5.3  U-band total flux density integrated over entire map,  Jy
+# Field  140:140  A1    Blank or < or - for U-band unresolved flux density at VLBA baselines
+# Field  141:145  F5.3  U-band unresolved flux density at long VLBA baselines, Jy
+#
+# Field  148:148  A1    Blank or < or - for K-band total flux density integrated over entire map
+# Field  149:153  F5.3  K-band total flux density integrated over entire map,  Jy
+# Field  155:155  A1    Blank or < or - for K-band unresolved flux density at VLBA baselines
+# Field  156:160  F5.3  K-band unresolved flux density at long VLBA baselines, Jy
+#
+# Field  163:165  A3    Used Band: S, C, X, U, K or X/S
+# Field  168:175  A8    Catalogue name
+#
+# Missing value: -1.0
+# minus in columns 88, 95, 103, 110, 118, 125, 133, 140, 148, 155 means that no data in the following column present
+# <     in columns 88, 95, 103, 110, 118, 125, 133, 140, 148, 155 means that the upper limit of the flux density is presented in the following column.
+#
+#  IVS name J2000 name  Right ascension Declination        D_alp  D_Del   Corr    #Obs  S-band flux    C-band Flux    X-band Flux   U-band flux    K-band Flux    Type Cat
+#                                                                                       Total  Unres   Total  Unres   Total  Unres  Total  Unres   Total  Unres
+#                       hr mn seconds   deg mn seconds      mas    mas                   Jy     Jy      Jy     Jy      Jy     Jy     Jy     Jy      Jy     Jy
+#
+N  2357-141 J0000-1352  00 00 03.124282 -13 52 00.75435    2.29   4.55   0.582     17  -1.00  -1.00    0.021  0.009   0.019  0.015  -1.00  -1.00   -1.00  -1.00   X/S  rfc_2020b
+N  2357+080 J0000+0816  00 00 07.031131 +08 16 45.05247    0.46   0.86   0.756     39  -1.00  -1.00   -1.00  -1.00    0.029  0.025  -1.00  -1.00   -1.00  -1.00   X    rfc_2020b
+N  2357-379 J0000-3738  00 00 08.414165 -37 38 20.67331    0.54   1.10   0.175     65  -1.00  -1.00    0.019  0.019   0.019  0.020  -1.00  -1.00   -1.00  -1.00   X    rfc_2020b
+N  2357+025 J0000+0248  00 00 19.282368 +02 48 14.68932    0.44   1.09  -0.107     28  -1.00  -1.00    0.039  0.018   0.038  0.024  -1.00  -1.00   -1.00  -1.00   X/S  rfc_2020b
+N  2357+113 J0000+1139  00 00 19.563954 +11 39 20.72989    1.05   2.77  -0.109     18  -1.00  -1.00    0.022  0.008   0.018  0.011  -1.00  -1.00   -1.00  -1.00   X/S  rfc_2020b
+C  2357-326 J0000-3221  00 00 20.399990 -32 21 01.23359    0.14   0.19  -0.087    464   0.569  0.428  -1.00  -1.00    0.260  0.138  -1.00  -1.00   -1.00  -1.00   X/S  rfc_2020b
+C  2357+028 J0000+0307  00 00 27.022477 +03 07 15.64692    0.19   0.26  -0.077    191   0.115  0.041   0.085  0.047   0.075  0.027  -1.00  -1.00   -1.00  -1.00   X/S  rfc_2020b
+C  2358+390 J0000+3918  00 00 41.527579 +39 18 04.14839    0.31   0.49  -0.074     45  -1.00  -1.00    0.070  0.056   0.094  0.076  -1.00  -1.00   -1.00  -1.00   X/S  rfc_2020b
+C  2358+028 J0000+030B  00 00 44.327836 +03 07 54.20171    2.90   5.77   0.231      4   0.035 -1.00   -1.00  -1.00    0.050  0.050  -1.00  -1.00   -1.00  -1.00   X    rfc_2020b
+N  2358+516 J0000+5157  00 00 51.385052 +51 57 19.89514    3.52   2.70  -0.095     14  -1.00  -1.00    0.037 <0.001   0.015 <0.001  -1.00  -1.00   -1.00  -1.00   C    rfc_2020b
+C  2358+406 J0000+4054  00 00 53.081057 +40 54 01.81096    0.19   0.20  -0.187    263   0.842  0.113  -1.00  -1.00    0.233  0.052  -1.00  -1.00   -1.00  -1.00   X/S  rfc_2020b
+C  2358-161 J0001-1551  00 01 05.328746 -15 51 07.07556    0.13   0.19  -0.320    397   0.327  0.186  -1.00  -1.00    0.205  0.106  -1.00  -1.00   -1.00  -1.00   X/S  rfc_2020b
+U  2358-179 J0001-1741  00 01 06.264886 -17 41 26.58339   20.06  20.41  -0.050      3  -1.00  -1.00    0.078 <0.002   0.040 <0.001  -1.00  -1.00   -1.00  -1.00   X/S  rfc_2020b
+C  2358+605 J0001+6051  00 01 07.099788 +60 51 22.79864    0.39   0.17  -0.095    252   0.149  0.042  -1.00  -1.00    0.142  0.094  -1.00  -1.00    0.095  0.075  X/S  rfc_2020b
+C  2358+240 J0001+2420  00 01 07.869808 +24 20 11.70845    0.77   1.09   0.119     32  -1.00  -1.00    0.091  0.042   0.065  0.024  -1.00  -1.00   -1.00  -1.00   X/S  rfc_2020b
+C  2358+189 J0001+1914  00 01 08.621571 +19 14 33.80176    0.11   0.10  -0.044   5075   0.319  0.269   0.156  0.127   0.273  0.220  -1.00  -1.00    0.220 <0.327  X/S  rfc_2020b
+C  2358+024 J0001+0243  00 01 09.535558 +02 43 09.60191    0.54   0.98   0.057     36  -1.00  -1.00    0.079  0.083   0.092  0.086  -1.00  -1.00   -1.00  -1.00   X/S  rfc_2020b
+N  2358-006 J0001-0020  00 01 11.196095 -00 20 11.56799    0.88   1.94  -0.481     34  -1.00  -1.00    0.022  0.022   0.020  0.019  -1.00  -1.00   -1.00  -1.00   X/S  rfc_2020b
+C  2358+236 J0001+2358  00 01 14.864561 +23 58 10.71063    0.43   0.68   0.281     46  -1.00  -1.00    0.056  0.038   0.069  0.052  -1.00  -1.00   -1.00  -1.00   X/S  rfc_2020b
+C  2358-080 J0001-0746  00 01 18.024920 -07 46 26.92171    0.13   0.17   0.045    467   0.204  0.112  -1.00  -1.00    0.165  0.047  -1.00  -1.00   -1.00  -1.00   X/S  rfc_2020b
+N  2358+474 J0001+4742  00 01 19.041791 +47 42 00.72334    0.64   1.23  -0.252     36  -1.00  -1.00    0.046  0.030   0.038  0.025  -1.00  -1.00   -1.00  -1.00   X/S  rfc_2020b
+C  2358+443 J0001+4440  00 01 21.385311 +44 40 27.21601    0.52   0.57   0.573     45  -1.00  -1.00    0.086  0.057   0.075  0.051  -1.00  -1.00   -1.00  -1.00   X/S  rfc_2020b
+N  2358+251 J0001+2526  00 01 21.673340 +25 26 55.45650    2.05   3.60  -0.267     17  -1.00  -1.00    0.017  0.010   0.019 <0.001  -1.00  -1.00   -1.00  -1.00   X/S  rfc_2020b
+N  2358+062 J0001+0632  00 01 23.694615 +06 32 30.93755    3.06  15.08  -0.816     31   0.018  0.022  -1.00  -1.00    0.018  0.009  -1.00  -1.00   -1.00  -1.00   X    rfc_2020b
+C  2358-072 J0001-0656  00 01 25.586924 -06 56 24.93260    0.47   1.06  -0.295     56  -1.00  -1.00    0.045  0.044   0.046  0.038  -1.00  -1.00   -1.00  -1.00   X/S  rfc_2020b
+N  2358-137 J0001-1326  00 01 26.049913 -13 26 33.14197    1.96   3.80  -0.657     11  -1.00  -1.00    0.022  0.013  -1.00  -1.00   -1.00  -1.00   -1.00  -1.00   C    rfc_2020b
+C  2358+209 J0001+2113  00 01 32.370506 +21 13 36.27468    0.33   0.46  -0.502     56  -1.00  -1.00    0.067  0.066   0.087  0.091  -1.00  -1.00   -1.00  -1.00   X/S  rfc_2020b
+N  2358-422 J0001-4155  00 01 32.755114 -41 55 25.33966  119.51  51.28  -0.904      5   0.009 <0.007  -1.00  -1.00    0.008 <0.007  -1.00  -1.00   -1.00  -1.00   X    rfc_2020b
+C  2358+146 J0001+1456  00 01 32.830699 +14 56 08.08157    0.41   0.87   0.014     28  -1.00  -1.00    0.063  0.028   0.053  0.031  -1.00  -1.00   -1.00  -1.00   X/S  rfc_2020b
+N  2359+526 J0001+5258  00 01 34.050623 +52 58 25.00660    1.46   1.28  -0.542     28  -1.00  -1.00    0.014  0.005   0.017 <0.001  -1.00  -1.00   -1.00  -1.00   C    rfc_2020b
+N  2359+071 J0001+0723  00 01 34.452574 +07 23 12.90923    2.92   2.77  -0.569      5  -1.00  -1.00   -1.00  -1.00    0.028  0.028  -1.00  -1.00   -1.00  -1.00   X    rfc_2020b
+C  2359+067 J0001+0701  00 01 43.467630 +07 01 23.55343    0.80   1.36   0.037     34  -1.00  -1.00    0.046  0.032   0.040  0.027  -1.00  -1.00   -1.00  -1.00   X/S  rfc_2020b
+N  2359+719 J0001+7213  00 01 45.957996 +72 13 58.35357    3.29   0.89  -0.425     47  -1.00  -1.00    0.027  0.010   0.029  0.013  -1.00  -1.00   -1.00  -1.00   X/S  rfc_2020b
+N  2359+548 J0002+5510  00 02 00.529455 +55 10 38.88184    1.63   0.55  -0.399     36  -1.00  -1.00    0.087 <0.001   0.048 <0.001  -1.00  -1.00   -1.00  -1.00   X/S  rfc_2020b
+N  2359+606 J0002+6058  00 02 06.696521 +60 58 29.83921    3.36   1.25  -0.162     22  -1.00  -1.00   -1.00  -1.00   -1.00  -1.00   -1.00  -1.00    0.082 <0.076  K    rfc_2020b
+C  2359-221 J0002-2153  00 02 11.981435 -21 53 09.86538    0.14   0.17  -0.279    369   0.056  0.056   0.063  0.060   0.128  0.108  -1.00  -1.00   -1.00  -1.00   X/S  rfc_2020b
+N  2359-677 J0002-6726  00 02 15.192736 -67 26 53.43420   49.75  18.20   0.552      5   0.006 <0.006  -1.00  -1.00    0.009 <0.006  -1.00  -1.00   -1.00  -1.00   X    rfc_2020b
+N  2359-038 J0002-0331  00 02 30.622578 -03 31 40.44095    0.90   1.99  -0.456     47  -1.00  -1.00    0.014  0.012   0.013  0.013  -1.00  -1.00   -1.00  -1.00   X/S  rfc_2020b
+C  2359+747 J0002+7459  00 02 31.131617 +74 59 47.13463    1.18   0.36  -0.681     28  -1.00  -1.00    0.117  0.088   0.108  0.078  -1.00  -1.00   -1.00  -1.00   X/S  rfc_2020b
+N  0000-044 J0002-0411  00 02 41.255213 -04 11 55.30940    0.62   1.42  -0.475     56  -1.00  -1.00    0.020  0.019   0.019  0.016  -1.00  -1.00   -1.00  -1.00   X/S  rfc_2020b
+C  0000+302 J0002+3032  00 02 49.250687 +30 32 41.59757    0.48   0.86   0.013     26  -1.00  -1.00    0.092  0.061   0.071  0.048  -1.00  -1.00   -1.00  -1.00   X/S  rfc_2020b
+C  0000-215 J0002-2114  00 02 49.766952 -21 14 20.10621    0.35   0.78  -0.071     28  -1.00  -1.00    0.106  0.049   0.104  0.057  -1.00  -1.00   -1.00  -1.00   X/S  rfc_2020b
+N  0000+294 J0002+2942  00 02 52.431418 +29 42 53.22536    0.62   1.06   0.096     28  -1.00  -1.00    0.020  0.014   0.028  0.017  -1.00  -1.00   -1.00  -1.00   X/S  rfc_2020b
+N  0000-566 J0002-5621  00 02 53.468287 -56 21 10.78322   13.18   5.13   0.419      7  -1.00  -1.00   -1.00  -1.00    0.166 <0.070  -1.00  -1.00   -1.00  -1.00   X    rfc_2020b
+N  0000-006 J0002-0024  00 02 57.175242 -00 24 47.27369    0.37   0.84  -0.113     64  -1.00  -1.00    0.037  0.027   0.030  0.027  -1.00  -1.00   -1.00  -1.00   X/S  rfc_2020b
+C  0000+183 J0003+1837  00 03 01.160211 +18 37 59.01231    0.41   1.05  -0.135     32  -1.00  -1.00    0.084  0.032   0.053  0.020  -1.00  -1.00   -1.00  -1.00   X/S  rfc_2020b
+N  0000-067 J0003-0626  00 03 01.831562 -06 26 59.59056    0.56   1.19  -0.369     52  -1.00  -1.00    0.083  0.023   0.053  0.012  -1.00  -1.00   -1.00  -1.00   X/S  rfc_2020b
+N  0000-550 J0003-5444  00 03 10.630542 -54 44 55.99190   23.36   5.96  -0.112      9  -1.00  -1.00   -1.00  -1.00    0.007 <0.006  -1.00  -1.00   -1.00  -1.00   X    rfc_2020b
+C  0000+274 J0003+2740  00 03 13.087656 +27 40 44.96965    0.35   0.78  -0.371     36  -1.00  -1.00    0.073  0.037   0.084  0.039  -1.00  -1.00   -1.00  -1.00   X/S  rfc_2020b
+C  0000+019 J0003+0214  00 03 14.962877 +02 14 57.48184    0.43   1.12  -0.325     28  -1.00  -1.00    0.039  0.033   0.031  0.029  -1.00  -1.00   -1.00  -1.00   X/S  rfc_2020b
+C  0000-199 J0003-1941  00 03 15.949416 -19 41 50.40200    0.14   0.22  -0.304    354   0.227  0.149  -1.00  -1.00    0.138  0.053  -1.00  -1.00   -1.00  -1.00   X/S  rfc_2020b
+C  0000-197 J0003-1927  00 03 18.675019 -19 27 22.35549    0.15   0.24  -0.166    408   0.183  0.108  -1.00  -1.00    0.126  0.057  -1.00  -1.00   -1.00  -1.00   X/S  rfc_2020b
+C  0000+212 J0003+2129  00 03 19.350003 +21 29 44.50852    0.13   0.17  -0.130    508   0.164  0.141   0.203  0.150   0.168  0.121   0.128  0.108  -1.00  -1.00   X/S  rfc_2020b
+N  0000-530 J0003-5247  00 03 19.600438 -52 47 27.28488   21.64  10.29  -0.291      8  -1.00  -1.00   -1.00  -1.00    0.013 <0.009  -1.00  -1.00   -1.00  -1.00   X    rfc_2020b
+C  0000-177 J0003-1727  00 03 21.954759 -17 27 11.87454    0.14   0.24  -0.002    286   0.203  0.077   0.156  0.074   0.150  0.063  -1.00  -1.00   -1.00  -1.00   X/S  rfc_2020b
+N  0000+070 J0003+0717  00 03 23.241392 +07 17 13.86257    0.31   0.58   0.012     45  -1.00  -1.00    0.030  0.010   0.023  0.012  -1.00  -1.00   -1.00  -1.00   X    rfc_2020b
+N  0000+218 J0003+2204  00 03 24.522825 +22 04 55.75098    0.42   0.73   0.321     45  -1.00  -1.00    0.010  0.008   0.010  0.011  -1.00  -1.00   -1.00  -1.00   X    rfc_2020b
+C  0000-160 J0003-1547  00 03 27.264167 -15 47 05.45551    0.15   0.28  -0.367    305   0.070  0.062  -1.00  -1.00    0.083  0.058  -1.00  -1.00   -1.00  -1.00   X/S  rfc_2020b
+N  0001+128 J0003+1305  00 03 35.246501 +13 05 41.78839    1.12   2.13   0.365     13  -1.00  -1.00    0.011  0.012   0.012  0.017  -1.00  -1.00   -1.00  -1.00   X    rfc_2020b
+C  0001+628 J0003+6307  00 03 36.511457 +63 07 55.87119    0.76   0.70  -0.201     35  -1.00  -1.00    0.090  0.055   0.077  0.049  -1.00  -1.00   -1.00  -1.00   X/S  rfc_2020b
+N  0001-114 J0003-1108  00 03 45.234677 -11 08 18.70574    0.92   2.48  -0.204     26  -1.00  -1.00    0.013  0.013   0.016  0.012  -1.00  -1.00   -1.00  -1.00   X/S  rfc_2020b
+C  0001+478 J0003+4807  00 03 46.041567 +48 07 04.13522    0.36   0.33  -0.072    227   0.297  0.144  -1.00  -1.00    0.070  0.031  -1.00  -1.00   -1.00  -1.00   X/S  rfc_2020b
+N  0001-387 J0003-3827  00 03 53.734283 -38 27 02.72824    9.00  21.38   0.391      8  -1.00  -1.00    0.090 <0.005   0.031 <0.002  -1.00  -1.00   -1.00  -1.00   X/S  rfc_2020b
+N  0001+298 J0003+3010  00 03 55.658015 +30 10 02.59438    0.63   1.13   0.171     45  -1.00  -1.00   -1.00  -1.00   -1.00  -1.00   -1.00  -1.00   -1.00  -1.00   X/S  rfc_2020b
+C  0001+324 J0003+3241  00 03 56.338446 +32 41 57.59708    0.49   0.89   0.003     26  -1.00  -1.00    0.058  0.051   0.056  0.042  -1.00  -1.00   -1.00  -1.00   X/S  rfc_2020b
+C  0001+059 J0003+0615  00 03 57.952182 +06 15 53.09639    0.71   1.21   0.054     35  -1.00  -1.00    0.053  0.045   0.049  0.026  -1.00  -1.00   -1.00  -1.00   X/S  rfc_2020b
+N  0001+084 J0003+0841  00 03 59.230124 +08 41 38.18613    0.28   0.62  -0.120     90  -1.00  -1.00   -1.00  -1.00    0.015  0.013  -1.00  -1.00   -1.00  -1.00   X    rfc_2020b
+C  0001+360 J0004+3617  00 04 04.212258 +36 17 20.40718    0.98   1.80  -0.024     23  -1.00  -1.00    0.039  0.033   0.027  0.012  -1.00  -1.00   -1.00  -1.00   X/S  rfc_2020b
+C  0001-120 J0004-1148  00 04 04.914995 -11 48 58.38594    0.12   0.17  -0.159    328   0.633  0.291  -1.00  -1.00    0.579  0.243  -1.00  -1.00   -1.00  -1.00   X/S  rfc_2020b
+U  0001-440 J0004-4345  00 04 07.257765 -43 45 10.14371    0.65   0.89  -0.171      3  -1.00  -1.00   -1.00  -1.00    0.184 <0.298  -1.00  -1.00   -1.00  -1.00   X/S  rfc_2020b
+C  0001-235 J0004-2318  00 04 08.948298 -23 18 40.88044    1.06   3.55  -0.608     22  -1.00  -1.00    0.061  0.035   0.039  0.013  -1.00  -1.00   -1.00  -1.00   X/S  rfc_2020b
+N  0001+080 J0004+0821  00 04 10.592867 +08 21 57.54428    0.54   1.20  -0.205     36  -1.00  -1.00    0.017  0.012   0.015  0.010  -1.00  -1.00   -1.00  -1.00   X/S  rfc_2020b
+N  0001-531 J0004-5254  00 04 14.013472 -52 54 58.70632    4.52   1.89   0.069     36  -1.00  -1.00   -1.00  -1.00    0.011 <0.014  -1.00  -1.00   -1.00  -1.00   X    rfc_2020b
