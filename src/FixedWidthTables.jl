@@ -1,7 +1,7 @@
 module FixedWidthTables
 
 
-convert_val(::Type{<:AbstractString},     val::AbstractString) = val  # e.g. SubString in case it is needed as-is
+convert_val(::Type{<:AbstractString},   val::AbstractString) = val  # e.g. SubString in case it is needed as-is
 convert_val(::Type{String},             val::AbstractString) = string(val)
 convert_val(::Type{Symbol},             val::AbstractString) = Symbol(val)
 convert_val(typ::Type{<:Integer},       val::AbstractString) = parse(typ, val)
