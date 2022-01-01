@@ -2,16 +2,6 @@ import FixedWidthTables as FWT
 using Test
 
 
-import Aqua
-import CompatHelperLocal as CHL
-@testset begin
-    CHL.@check()
-    Aqua.test_ambiguities(FWT, recursive=false)
-    Aqua.test_unbound_args(FWT)
-    Aqua.test_undefined_exports(FWT)
-    Aqua.test_stale_deps(FWT)
-end
-
 @testset begin
     a = FWT.read("rfc_2020b_cat.txt",
         (
@@ -36,4 +26,15 @@ end
     b = FWT.read("0005m23.umrao", skiprows=1:1, headerrow=2)
 
     c = FWT.read("rfc_2021a_z.txt", headerrow="J2000      B1950    | UNK| fullname                      |ratext      |dectext     |class |  redshift|flag|redshift_ref       ")
+end
+
+
+import Aqua
+import CompatHelperLocal as CHL
+@testset begin
+    CHL.@check()
+    Aqua.test_ambiguities(FWT, recursive=false)
+    Aqua.test_unbound_args(FWT)
+    Aqua.test_undefined_exports(FWT)
+    Aqua.test_stale_deps(FWT)
 end
