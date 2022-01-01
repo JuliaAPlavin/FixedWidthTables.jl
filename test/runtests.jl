@@ -2,6 +2,16 @@ using FixedWidthTables
 using Test
 
 
+import Aqua
+import CompatHelperLocal
+@testset begin
+    CompatHelperLocal.@check()
+    Aqua.test_ambiguities(FixedWidthTables, recursive=false)
+    Aqua.test_unbound_args(FixedWidthTables)
+    Aqua.test_undefined_exports(FixedWidthTables)
+    Aqua.test_stale_deps(FixedWidthTables)
+end
+
 @testset begin
     a = FixedWidthTables.read("rfc_2020b_cat.txt",
         (

@@ -2,3 +2,6 @@ name = "FixedWidthTables"
 uuid = "ef6c9296-b25d-482c-a0a7-898918678e13"
 authors = ["Alexander Plavin <alexander@plav.in>"]
 version = "0.1.2"
+
+[compat]
+julia = "1.5"
