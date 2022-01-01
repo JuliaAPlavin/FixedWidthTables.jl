@@ -60,8 +60,8 @@ function read(io;
     end
     
     field_names = [
-        strip(header[min.(rng, length(header))], delim)
-        for rng in field_ranges
+        isdisjoint(rng, eachindex(header)) ? "_field_$i" : strip(header[intersect(rng, eachindex(header))], delim)
+        for (i, rng) in enumerate(field_ranges)
     ]
 
     colspecs = map(field_names, field_ranges) do name, rng

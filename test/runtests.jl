@@ -25,7 +25,10 @@ using Test
 
     b = FWT.read("0005m23.umrao", skiprows=1:1, headerrow=2)
 
-    c = FWT.read("rfc_2021a_z.txt", headerrow="J2000      B1950    | UNK| fullname                      |ratext      |dectext     |class |  redshift|flag|redshift_ref       ")
+    c = FWT.read("S_0048-097.txt", skiprows=1:1, headerrow=2)
+    @test keys(c[1]) == (:YYYYMMDD, Symbol("Freq."), Symbol("U.T."), :S, :SigS, :N, :_field_7, :_field_8, :_field_9)
+
+    d = FWT.read("rfc_2021a_z.txt", headerrow="J2000      B1950    | UNK| fullname                      |ratext      |dectext     |class |  redshift|flag|redshift_ref       ")
 end
 
 

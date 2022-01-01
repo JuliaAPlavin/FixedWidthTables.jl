@@ -1,0 +1,4 @@
+ Source   48 -97  0048-097         Avg. Period =    1 days  UMRAO
+ YYYYMMDD  Freq.  U.T.      S     SigS    N
+ 19690918   8.0  1.953     1.62   0.10     1
+ 20100726  14.5  9.617     0.10   0.03     1  <suspect; very low
