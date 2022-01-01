@@ -1,19 +1,19 @@
-using FixedWidthTables
+import FixedWidthTables as FWT
 using Test
 
 
 import Aqua
-import CompatHelperLocal
+import CompatHelperLocal as CHL
 @testset begin
-    CompatHelperLocal.@check()
-    Aqua.test_ambiguities(FixedWidthTables, recursive=false)
-    Aqua.test_unbound_args(FixedWidthTables)
-    Aqua.test_undefined_exports(FixedWidthTables)
-    Aqua.test_stale_deps(FixedWidthTables)
+    CHL.@check()
+    Aqua.test_ambiguities(FWT, recursive=false)
+    Aqua.test_unbound_args(FWT)
+    Aqua.test_undefined_exports(FWT)
+    Aqua.test_stale_deps(FWT)
 end
 
 @testset begin
-    a = FixedWidthTables.read("rfc_2020b_cat.txt",
+    a = FWT.read("rfc_2020b_cat.txt",
         (
             cat = (1:1, Char),
             name = (4:11, String),
@@ -25,7 +25,7 @@ end
     @test length(unique(a)) == 73
     @test a[1] == (cat = 'N', name = "2357-141", cnt = 17)
 
-    @test_throws ArgumentError FixedWidthTables.read("rfc_2020b_cat.txt",
+    @test_throws ArgumentError FWT.read("rfc_2020b_cat.txt",
         (
             cat = (1:1, Char),
             name = (4:11, String),
@@ -33,5 +33,7 @@ end
         ),
     )
 
-    b = FixedWidthTables.read("0005m23.umrao", skiprows=1:1, headerrow=2)
+    b = FWT.read("0005m23.umrao", skiprows=1:1, headerrow=2)
+
+    # c = Fi
 end
