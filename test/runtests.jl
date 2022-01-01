@@ -32,4 +32,6 @@ end
             cnt = (80:85, Int),
         ),
     )
+
+    b = FixedWidthTables.read("0005m23.umrao", skiprows=1:1, headerrow=2)
 end
