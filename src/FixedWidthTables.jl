@@ -20,7 +20,7 @@ function read(io;
         headerrow=nothing)
     lines = readlines(io)
     ixlines = filter(((i, line),) -> i ∉ skiprows && !any(startswith.(line, skiprows_startwith)), enumerate(lines) |> collect)
-    header = only(line for (i, line) in ixlines if i == headerrow)
+    header = isa(headerrow, AbstractString) ? headerrow : only(line for (i, line) in ixlines if i == headerrow)
 
     maxlen = maximum(il -> length(il[2]), ixlines)
     char_flags = fill(:delim, maxlen)
