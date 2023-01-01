@@ -1,6 +1,7 @@
 module FixedWidthTables
 
-using IterTools
+using StructArrays
+
 
 convert_val(::Type{<:AbstractString},   val::AbstractString) = val  # e.g. SubString in case it is needed as-is
 convert_val(::Type{String},             val::AbstractString) = string(val)
@@ -79,16 +80,19 @@ function read(io;
 
     ixlines = filter!(((i,l),) -> i != headerrow, ixlines)
 
-    map(ixlines) do (i, line)
+    res = StructArray(map(T -> T[], spec_types(colspecs)))
+    for (i, line) in ixlines
         cr = check_restrictions(line, restrictions, colspecs)
         isnothing(cr) || throw(ArgumentError("Line $i: " * cr))
 
         try
-            parse_row(line, colspecs; strip_chars=delim, missings)
+            r = parse_row(line, colspecs; strip_chars=delim, missings)
+            res = StructArrays.append!!(res, (r,))
         catch e
             rethrow(ErrorException("$e \n on line $i: '$line'"))
         end
     end
+    res
 end
 
 
@@ -104,9 +108,12 @@ function read(io, colspecs;
 
     ixlines = process(frs, eachline(io))
 
-    map(ixlines) do (i, line)
-        process_line(i, line, colspecs, restrictions; strip_chars, missings)
+    res = StructArray(map(T -> T[], spec_types(colspecs)))
+    for (i, line) in ixlines
+        r = process_line(i, line, colspecs, restrictions; strip_chars, missings)
+        res = StructArrays.append!!(res, (r,))
     end
+    res
 end
 
 
@@ -125,6 +132,9 @@ Base.@kwdef struct ColSpecs{TR <: NamedTuple, TT <: NamedTuple}
     types::TT
     used_chars::Vector{Bool}
 end
+
+spec_types(cs::ColSpecs) = cs.types
+spec_types(cs::Vector{<:ColSpecs}) = spec_types(first(cs))
 
 max_used_index(cs::ColSpecs) = length(cs.used_chars)
 
