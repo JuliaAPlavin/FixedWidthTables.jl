@@ -173,7 +173,7 @@ function check_restrictions(line::AbstractString, rs::Restrictions, cs::ColSpecs
         return "line length is $(length(line)), shorter than expected $max_used_index (use allow_shorter_lines=true if indended): '$line'"
     end
     if rs.restrict_unused_chars !== Returns(true)
-        unused = @views line[max_used_index(cs) + 1:end] * line[findall(!, cs.used_chars[1:length(line)])]
+        unused = @views line[findall(!, cs.used_chars[1:min(end, length(line))])] * line[max_used_index(cs) + 1:end]
         disallowed_chars = filter(!rs.restrict_unused_chars, unused)
         isempty(disallowed_chars) || return "disallowed characters $(disallowed_chars) in '$line'"
     end
