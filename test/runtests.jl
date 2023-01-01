@@ -1,4 +1,5 @@
 import FixedWidthTables as FWT
+using InlineStrings
 using Test
 
 
@@ -17,6 +18,18 @@ using Test
     @test isequal(a[1], (cat = 'N', name = "2357-141", cnt = 17, s_flux=missing))
     @test isequal(a.s_flux, [missing, missing, missing, missing, missing, 0.569, 0.115, missing, 0.035, missing, 0.842, 0.327, missing, 0.149, missing, 0.319, missing, missing, missing, 0.204, missing, missing, missing, 0.018, missing, missing, missing, 0.009, missing, missing, missing, missing, missing, missing, missing, 0.056, 0.006, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, 0.227, 0.183, 0.164, missing, 0.203, missing, missing, 0.07, missing, missing, missing, 0.297, missing, missing, missing, missing, missing, missing, 0.633, missing, missing, missing, missing])
     @test eltype(a) == @NamedTuple{cat::Char, name::String, cnt::Int, s_flux::Union{Float64, Missing}}
+
+    a = FWT.read("rfc_2020b_cat.txt",
+        (
+            cat = (1:1, String1),
+            name = (4:11, String15),
+            cnt = (80:85, Int),
+            s_flux = (88:93, Float64),
+        ),
+        allow_shorter_lines=true, skiprows_startwith=["#"], missings=["-1.00"],
+    )
+    @test isequal(a[1], (cat = "N", name = "2357-141", cnt = 17, s_flux=missing))
+    @test eltype(a) == @NamedTuple{cat::String1, name::String15, cnt::Int, s_flux::Union{Float64, Missing}}
 
     @test_throws ArgumentError FWT.read("rfc_2020b_cat.txt",
         (

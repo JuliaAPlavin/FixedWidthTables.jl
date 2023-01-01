@@ -3,7 +3,8 @@ module FixedWidthTables
 using StructArrays
 
 
-convert_val(::Type{<:AbstractString},   val::AbstractString) = val  # e.g. SubString in case it is needed as-is
+convert_val(::Type{AbstractString},     val::AbstractString) = val  # e.g. SubString in case it is needed as-is
+convert_val(T::Type{<:AbstractString},  val::AbstractString) = T(val)  # e.g. InlineString
 convert_val(::Type{String},             val::AbstractString) = string(val)
 convert_val(::Type{Char},               val::AbstractString) = only(val)
 convert_val(::Type{Symbol},             val::AbstractString) = Symbol(val)
