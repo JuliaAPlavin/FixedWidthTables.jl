@@ -17,11 +17,17 @@ test_match(target::Vector{Char},   s::Char) = s ∈ target
 
 
 function read(io;
-        skiprows=[], skiprows_startwith=[], missings=[],
+        skiprows=Int[], skiprows_startwith=String[], missings=String[],
         delim=' ',
-        headerrow=nothing)
-    lines = readlines(io)
-    ixlines = filter(((i, line),) -> i ∉ skiprows && !any(startswith.(line, skiprows_startwith)), enumerate(lines) |> collect)
+        headerrow::Union{Int, AbstractString})
+    frs = FilterRowsSpec(skip_indices=skiprows, pred=line -> !any(startswith.(line, skiprows_startwith)))
+    restrictions = Restrictions(;
+        allow_shorter_lines=true,
+        restrict_unused_chars=c -> test_match(delim, c),
+    )
+
+    ixlines = process(frs, eachline(io))
+
     header = isa(headerrow, AbstractString) ? headerrow : only(line for (i, line) in ixlines if i == headerrow)
 
     maxlen = maximum(il -> length(il[2]), ixlines)
@@ -70,10 +76,6 @@ function read(io;
         Symbol(name) => (rng, String)
     end
     colspecs = ColSpecs((; colspecs...); allow_overlap=false)
-    restrictions = Restrictions(;
-        allow_shorter_lines=true,
-        restrict_unused_chars=c -> test_match(delim, c),
-    )
 
     ixlines = filter!(((i,l),) -> i != headerrow, ixlines)
 
