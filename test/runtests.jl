@@ -31,6 +31,13 @@ using Test
 
     d = FWT.read("rfc_2021a_z.txt", headerrow="J2000      B1950    | UNK| fullname                      |ratext      |dectext     |class |  redshift|flag|redshift_ref       ", delim=[' ', '|'])
     @test d[1] == (J2000 = "J0000+0307", B1950 = "2357+028", UNK = "0.1", fullname = "SDSS J000027.01+030715.5", ratext = "00h00m27.02s", dectext = "+03d07m15.6s", class = "RadioS", redshift = "2.353124", flag = "SPEC", redshift_ref = "2016SDSSD.C...0000:")
+
+    e = FWT.read("cats_table.txt",
+        [
+            (cat=(1:5, String),name=(8:27, String),RA=(29:40, String),eRA=(43:47, String),Dec=(50:61, String),eDec=(63:67, String),freq=(69:76, String),flux=(78:86, String),flux_err=(88:95, String),_=(97:97, String)),
+            (cat=(1:5, String),name=(8:28, String),RA=(30:41, String),eRA=(44:48, String),Dec=(51:62, String),eDec=(64:68, String),freq=(70:77, String),flux=(79:87, String),flux_err=(89:96, String),_=(98:98, String)),
+        ];
+        skiprows_startwith="#", restrict_remaining_chars=' ')
 end
 
 

@@ -92,7 +92,7 @@ function read(io;
 end
 
 
-function read(io, colspecs::NamedTuple;
+function read(io, colspecs;
         skiprows=Int[], skiprows_startwith=String[], missings=String[], strip_chars=[' '],
         allow_shorter_lines=false, allow_overlap=false, restrict_remaining_chars=nothing)
     frs = FilterRowsSpec(skip_indices=skiprows, pred=line -> !any(startswith.(line, skiprows_startwith)))
@@ -105,14 +105,7 @@ function read(io, colspecs::NamedTuple;
     ixlines = process(frs, eachline(io))
 
     map(ixlines) do (i, line)
-        cr = check_restrictions(line, restrictions, colspecs)
-        isnothing(cr) || throw(ArgumentError("Line $i: " * cr))
-
-        try
-            parse_row(line, colspecs; strip_chars, missings)
-        catch e
-            rethrow(ErrorException("$e \n on line $i: '$line'"))
-        end
+        process_line(i, line, colspecs, restrictions; strip_chars, missings)
     end
 end
 
@@ -152,6 +145,8 @@ function ColSpecs(specs::NamedTuple; allow_overlap::Bool)
     return ColSpecs(; char_rngs, types, used_chars)
 end
 
+ColSpecs(specs::Vector{<:NamedTuple}; allow_overlap::Bool) = ColSpecs.(specs; allow_overlap)
+
 function parse_row(line::AbstractString, cs::ColSpecs; strip_chars, missings)
     map(cs.char_rngs, cs.types) do rng, typ
         @assert step(rng) == 1
@@ -178,6 +173,37 @@ function check_restrictions(line::AbstractString, rs::Restrictions, cs::ColSpecs
         isempty(disallowed_chars) || return "disallowed characters $(disallowed_chars) in '$line'"
     end
     return nothing
+end
+
+
+function process_line(i::Int, line::AbstractString, cs::ColSpecs, rs::Restrictions; strip_chars, missings)
+    cr = check_restrictions(line, rs, cs)
+    if !isnothing(cr)
+        throw(ArgumentError("Line $i: " * cr))
+    end
+
+    try
+        return parse_row(line, cs; strip_chars, missings)
+    catch e
+        rethrow(ErrorException("$e \n on line $i: '$line'"))
+    end
+end
+
+function process_line(i::Int, line::AbstractString, cses::Vector{<:ColSpecs}, rs::Restrictions; strip_chars, missings)
+    for (j, cs) in cses |> enumerate
+        cr = check_restrictions(line, rs, cs)
+        if !isnothing(cr)
+            j == lastindex(cses) ?
+                throw(ArgumentError("Line $i: " * cr)) :
+                continue
+        end
+
+        try
+            return parse_row(line, cs; strip_chars, missings)
+        catch e
+            rethrow(ErrorException("$e \n on line $i: '$line'"))
+        end
+    end
 end
 
 end
