@@ -90,6 +90,31 @@ function read(io;
 end
 
 
+function read(io, colspecs::NamedTuple;
+        skiprows=Int[], skiprows_startwith=String[], missings=String[], strip_chars=[' '],
+        allow_shorter_lines=false, allow_overlap=false, restrict_remaining_chars=nothing)
+    frs = FilterRowsSpec(skip_indices=skiprows, pred=line -> !any(startswith.(line, skiprows_startwith)))
+    colspecs = ColSpecs(colspecs; allow_overlap)
+    restrictions = Restrictions(;
+        allow_shorter_lines,
+        restrict_unused_chars=isnothing(restrict_remaining_chars) ? Returns(true) : ∈(restrict_remaining_chars),
+    )
+
+    ixlines = process(frs, eachline(io))
+
+    map(ixlines) do (i, line)
+        cr = check_restrictions(line, restrictions, colspecs)
+        isnothing(cr) || throw(ArgumentError("Line $i: " * cr))
+
+        try
+            parse_row(line, colspecs; strip_chars, missings)
+        catch e
+            rethrow(ErrorException("$e \n on line $i: '$line'"))
+        end
+    end
+end
+
+
 Base.@kwdef struct FilterRowsSpec{TI <: AbstractVector{Int}, TC}
     skip_indices::TI
     pred::TC
@@ -151,31 +176,6 @@ function check_restrictions(line::AbstractString, rs::Restrictions, cs::ColSpecs
         isempty(disallowed_chars) || return "disallowed characters $(disallowed_chars) in '$line'"
     end
     return nothing
-end
-
-
-function read(io, colspecs::NamedTuple;
-        skiprows=Int[], skiprows_startwith=String[], missings=String[], strip_chars=[' '],
-        allow_shorter_lines=false, allow_overlap=false, restrict_remaining_chars=nothing)
-    frs = FilterRowsSpec(skip_indices=skiprows, pred=line -> !any(startswith.(line, skiprows_startwith)))
-    colspecs = ColSpecs(colspecs; allow_overlap)
-    restrictions = Restrictions(;
-        allow_shorter_lines,
-        restrict_unused_chars=isnothing(restrict_remaining_chars) ? Returns(true) : ∈(restrict_remaining_chars),
-    )
-
-    ixlines = process(frs, eachline(io))
-
-    map(ixlines) do (i, line)
-        cr = check_restrictions(line, restrictions, colspecs)
-        isnothing(cr) || throw(ArgumentError("Line $i: " * cr))
-
-        try
-            parse_row(line, colspecs; strip_chars, missings)
-        catch e
-            rethrow(ErrorException("$e \n on line $i: '$line'"))
-        end
-    end
 end
 
 end
