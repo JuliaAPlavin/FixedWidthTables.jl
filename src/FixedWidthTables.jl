@@ -12,6 +12,8 @@ convert_val(typ::Type{<:AbstractFloat}, val::AbstractString) = parse(typ, replac
 test_match(target::String,   s::AbstractString) = s == target
 test_match(target::Regex,    s::AbstractString) = occursin(target, s)
 test_match(target::Function, s::AbstractString) = target(s)
+test_match(target::Char,   s::Char) = s == target
+test_match(target::Vector{Char},   s::Char) = s ∈ target
 
 
 function read(io;
@@ -25,10 +27,10 @@ function read(io;
     maxlen = maximum(il -> length(il[2]), ixlines)
     char_flags = fill(:delim, maxlen)
     for (i, line) in ixlines
-        char_flags[findall((!=)(delim), collect(line))] .= :value
+        char_flags[findall(c -> !test_match(delim, c), collect(line))] .= :value
     end
     for (i, ch) in enumerate(collect(header))
-        if ch == delim && char_flags[i] != :delim
+        if test_match(delim, ch) && char_flags[i] != :delim
             char_flags[i] = :value_but_header_delim
         end
     end
