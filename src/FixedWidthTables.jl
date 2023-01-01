@@ -87,15 +87,32 @@ function read(io;
     end
 end
 
-function read(io, colspecs::NamedTuple;
-        skiprows=[], skiprows_startwith=[], missings=[], strip_chars=[' '],
-        allow_shorter_lines=false, allow_overlap=false, restrict_remaining_chars=nothing)
-    lines = eachline(io)
-    ixlines = filter(((i, line),) -> i ∉ skiprows && !any(startswith.(line, skiprows_startwith)), enumerate(lines) |> collect)
 
-    max_used_index = maximum(((rng, typ),) -> maximum(rng), colspecs)
+Base.@kwdef struct FilterRowsSpec{TI <: AbstractVector{Int}, TC}
+    skip_indices::TI
+    pred::TC
+end
+
+process(frs::FilterRowsSpec, lines) =
+    filter(enumerate(lines) |> collect) do (i, line)
+        i ∉ frs.skip_indices && frs.pred(line)
+    end
+
+Base.@kwdef struct ColSpecs{TR <: NamedTuple, TT <: NamedTuple}
+    char_rngs::TR
+    types::TT
+    used_chars::Vector{Bool}
+end
+
+max_used_index(cs::ColSpecs) = length(cs.used_chars)
+
+function ColSpecs(specs::NamedTuple; allow_overlap::Bool)
+    @assert eltype(specs) <: Tuple{UnitRange{Int}, DataType}
+    char_rngs = map(first, specs)
+    types = map(last, specs)
+    max_used_index = maximum(maximum, char_rngs)
     used_chars = zeros(Bool, max_used_index)
-    for (name, (rng, typ)) in colspecs |> pairs
+    for (name, rng) in char_rngs |> pairs
         if !allow_overlap
             if any(used_chars[rng])
                 ArgumentError("column $name overlaps with another") |> throw
@@ -103,39 +120,55 @@ function read(io, colspecs::NamedTuple;
         end
         used_chars[rng] .= true
     end
+    return ColSpecs(; char_rngs, types, used_chars)
+end
+
+function parse_row(line::AbstractString, cs::ColSpecs; strip_chars, missings)
+    map(cs.char_rngs, cs.types) do rng, typ
+        @assert step(rng) == 1
+        s_val = line[rng.start:min(end, rng.stop)]
+        s_val = strip(s_val, strip_chars)
+        is_miss = any(ms -> test_match(ms, s_val), missings)
+        f_val = is_miss ? missing : convert_val(typ, s_val)
+    end
+end
+
+
+Base.@kwdef struct Restrictions{TP}
+    allow_shorter_lines::Bool
+    restrict_unused_chars::TP
+end
+
+function check_restrictions(line::AbstractString, rs::Restrictions, cs::ColSpecs)
+    if !rs.allow_shorter_lines && length(line) < max_used_index(cs)
+        return "line length is $(length(line)), shorter than expected $max_used_index (use allow_shorter_lines=true if indended): '$line'"
+    end
+    if rs.restrict_unused_chars !== Returns(true)
+        unused = line[max_used_index(cs) + 1:end] * line[.!cs.used_chars]
+        disallowed_chars = filter(!rs.restrict_unused_chars, unused)
+        isempty(disallowed_chars) || return "disallowed characters $(disallowed_chars) in '$line'"
+    end
+end
+
+
+function read(io, colspecs::NamedTuple;
+        skiprows=Int[], skiprows_startwith=String[], missings=String[], strip_chars=[' '],
+        allow_shorter_lines=false, allow_overlap=false, restrict_remaining_chars=nothing)
+    frs = FilterRowsSpec(skip_indices=skiprows, pred=line -> !any(startswith.(line, skiprows_startwith)))
+    colspecs = ColSpecs(colspecs; allow_overlap)
+    restrictions = Restrictions(;
+        allow_shorter_lines,
+        restrict_unused_chars=isnothing(restrict_remaining_chars) ? Returns(true) : ∈(restrict_remaining_chars),
+    )
+
+    ixlines = process(frs, eachline(io))
 
     map(ixlines) do (i, line)
-        if restrict_remaining_chars != nothing
-            unused_portion = if allow_shorter_lines
-                line[filter(ix -> ix <= length(line), findall(.!used_chars))]
-            else
-                line[findall(.!used_chars)]
-            end
-            for block in [
-                    line[max_used_index + 1:end],
-                    unused_portion,
-                ]
-                if !isempty(setdiff(block, restrict_remaining_chars))
-                    ArgumentError("disallowed characters $(setdiff(block, restrict_remaining_chars)) in line $i: '$line'") |> throw
-                end
-            end
-        end
-        if !allow_shorter_lines && length(line) < max_used_index
-            ArgumentError("line $i length is $(length(line)), shorter than expected $max_used_index (use allow_shorter_lines=true if indended): '$line'") |> throw
-        end
+        cr = check_restrictions(line, restrictions, colspecs)
+        isnothing(cr) || throw(ArgumentError("Line $i: " * cr))
 
         try
-            map(colspecs) do (rng, typ)
-                @assert step(rng) == 1
-                s_val = if allow_shorter_lines
-                    line[rng.start:min(length(line), rng.stop)]
-                else
-                    line[rng]
-                end
-                s_val = strip(s_val, strip_chars)
-                is_miss = any(ms -> test_match(ms, s_val), missings)
-                f_val = is_miss ? missing : convert_val(typ, s_val)
-            end
+            parse_row(line, colspecs; strip_chars, missings)
         catch e
             rethrow(ErrorException("$e \n on line $i: '$line'"))
         end
