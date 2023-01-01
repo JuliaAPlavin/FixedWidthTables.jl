@@ -69,18 +69,20 @@ function read(io;
     colspecs = map(field_names, field_ranges) do name, rng
         Symbol(name) => (rng, String)
     end
-    colspecs = (; colspecs...)
+    colspecs = ColSpecs((; colspecs...); allow_overlap=false)
+    restrictions = Restrictions(;
+        allow_shorter_lines=true,
+        restrict_unused_chars=c -> test_match(delim, c),
+    )
 
     ixlines = filter!(((i,l),) -> i != headerrow, ixlines)
+
     map(ixlines) do (i, line)
+        cr = check_restrictions(line, restrictions, colspecs)
+        isnothing(cr) || throw(ArgumentError("Line $i: " * cr))
+
         try
-            map(colspecs) do (rng, typ)
-                @assert step(rng) == 1
-                s_val = line[rng.start:min(length(line), rng.stop)]
-                s_val = strip(s_val, delim)
-                is_miss = any(ms -> test_match(ms, s_val), missings)
-                f_val = is_miss ? missing : convert_val(typ, s_val)
-            end
+            parse_row(line, colspecs; strip_chars=delim, missings)
         catch e
             rethrow(ErrorException("$e \n on line $i: '$line'"))
         end
@@ -144,10 +146,11 @@ function check_restrictions(line::AbstractString, rs::Restrictions, cs::ColSpecs
         return "line length is $(length(line)), shorter than expected $max_used_index (use allow_shorter_lines=true if indended): '$line'"
     end
     if rs.restrict_unused_chars !== Returns(true)
-        unused = line[max_used_index(cs) + 1:end] * line[.!cs.used_chars]
+        unused = @views line[max_used_index(cs) + 1:end] * line[findall(!, cs.used_chars[1:length(line)])]
         disallowed_chars = filter(!rs.restrict_unused_chars, unused)
         isempty(disallowed_chars) || return "disallowed characters $(disallowed_chars) in '$line'"
     end
+    return nothing
 end
 
 
