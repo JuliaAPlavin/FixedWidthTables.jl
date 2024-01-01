@@ -1,5 +1,6 @@
 module FixedWidthTables
 
+using DataPipes
 using StructArrays
 
 
@@ -18,7 +19,12 @@ test_match(target::Char,   s::Char) = s == target
 test_match(target::Vector{Char},   s::Char) = s ∈ target
 
 
-function read(io;
+function read end
+
+read(io, colspecs; kwargs...) = read(io, StructArray, colspecs; kwargs...)
+read(io; kwargs...) = read(io, StructArray; kwargs...)
+
+function read(io, sink::Type;
         skiprows=Int[], skiprows_startwith=String[], missings=String[],
         delim=' ',
         headerrow::Union{Int, AbstractString})
@@ -28,7 +34,7 @@ function read(io;
         restrict_unused_chars=c -> test_match(delim, c),
     )
 
-    ixlines = process(frs, eachline(io))
+    ixlines = ixlineiterator(io, frs) |> collect
 
     header = isa(headerrow, AbstractString) ? headerrow : only(line for (i, line) in ixlines if i == headerrow)
 
@@ -77,27 +83,21 @@ function read(io;
     colspecs = map(field_names, field_ranges) do name, rng
         Symbol(name) => (rng, String)
     end
-    colspecs = ColSpecs((; colspecs...); allow_overlap=false)
+    colspecs = ColSpecs(_colspecs_from_pairs(sink, colspecs); allow_overlap=false)
 
-    ixlines = filter!(((i,l),) -> i != headerrow, ixlines)
-
-    res = StructArray(map(T -> T[], spec_types(colspecs)))
-    for (i, line) in ixlines
-        cr = check_restrictions(line, restrictions, colspecs)
-        isnothing(cr) || throw(ArgumentError("Line $i: " * cr))
-
-        try
-            r = parse_row(line, colspecs; strip_chars=delim, missings)
-            res = StructArrays.append!!(res, (r,))
-        catch e
-            rethrow(ErrorException("$e \n on line $i: '$line'"))
+    rows = @p let 
+        ixlines
+        filter!(((i,l),) -> i != headerrow)
+        Iterators.map() do (i, line)
+            process_line(i, line, colspecs, restrictions; strip_chars=delim, missings)
         end
     end
-    res
+    cols = map(T -> T[], spec_types(colspecs))
+    cols = materialize!(cols, Iterators.Stateful(rows))
+    return sink(cols)
 end
 
-
-function read(io, colspecs;
+function read(io, sink, colspecs;
         skiprows=Int[], skiprows_startwith=String[], missings=String[], strip_chars=[' '],
         allow_shorter_lines=false, allow_overlap=false, restrict_remaining_chars=nothing)
     frs = FilterRowsSpec(skip_indices=skiprows, pred=line -> !any(startswith.(line, skiprows_startwith)))
@@ -106,29 +106,46 @@ function read(io, colspecs;
         allow_shorter_lines,
         restrict_unused_chars=isnothing(restrict_remaining_chars) ? Returns(true) : ∈(restrict_remaining_chars),
     )
-
-    ixlines = process(frs, eachline(io))
-
-    res = StructArray(map(T -> T[], spec_types(colspecs)))
-    for (i, line) in ixlines
-        r = process_line(i, line, colspecs, restrictions; strip_chars, missings)
-        res = StructArrays.append!!(res, (r,))
-    end
-    res
+    options = ReadOptions(frs, colspecs, restrictions, strip_chars, missings)
+    cols = map(T -> T[], spec_types(colspecs))
+    cols = materialize!(cols, rowiterator(io, options))
+    return sink(cols)
 end
 
+function materialize!(cols, rows, state=nothing)
+    for row in rows
+        newcols = _pushrow!!(cols, row)
+        if newcols !== cols
+            return materialize!(newcols, rows)
+        end
+    end
+    return cols
+end
+
+_pushrow!!(cols, row) = map(_push!!, cols, row)
+_push!!(col::AbstractVector{T}, val::T) where {T} = push!(col, val)
+_push!!(col::AbstractVector{T}, val::Union{T, Missing}) where {T} = push!(convert(AbstractVector{Union{T,Missing}}, col), val)
+
+rowiterator(io, o) = @p let
+    ixlineiterator(io, o.frs)
+    Iterators.map() do (i, line)
+        process_line(i, line, o.colspecs, o.restrictions; o.strip_chars, o.missings)
+    end
+end
+
+_colspecs_from_pairs(::Type{StructArray}, pairs) = (; pairs...)
 
 Base.@kwdef struct FilterRowsSpec{TI <: AbstractVector{Int}, TC}
     skip_indices::TI
     pred::TC
 end
 
-process(frs::FilterRowsSpec, lines) =
-    filter(enumerate(lines) |> collect) do (i, line)
+ixlineiterator(io, frs::FilterRowsSpec) =
+    Iterators.filter(enumerate(eachline(io))) do (i, line)
         i ∉ frs.skip_indices && frs.pred(line)
     end
 
-Base.@kwdef struct ColSpecs{TR <: NamedTuple, TT <: NamedTuple}
+Base.@kwdef struct ColSpecs{TR, TT}
     char_rngs::TR
     types::TT
     used_chars::Vector{Bool}
@@ -139,7 +156,7 @@ spec_types(cs::Vector{<:ColSpecs}) = spec_types(first(cs))
 
 max_used_index(cs::ColSpecs) = length(cs.used_chars)
 
-function ColSpecs(specs::NamedTuple; allow_overlap::Bool)
+function ColSpecs(specs; allow_overlap::Bool)
     @assert eltype(specs) <: Tuple{UnitRange{Int}, DataType}
     char_rngs = map(first, specs)
     types = map(last, specs)
@@ -156,7 +173,7 @@ function ColSpecs(specs::NamedTuple; allow_overlap::Bool)
     return ColSpecs(; char_rngs, types, used_chars)
 end
 
-ColSpecs(specs::Vector{<:NamedTuple}; allow_overlap::Bool) = ColSpecs.(specs; allow_overlap)
+ColSpecs(specs::AbstractVector; allow_overlap::Bool) = ColSpecs.(specs; allow_overlap)
 
 function parse_row(line::AbstractString, cs::ColSpecs; strip_chars, missings)
     map(cs.char_rngs, cs.types) do rng, typ
@@ -184,6 +201,14 @@ function check_restrictions(line::AbstractString, rs::Restrictions, cs::ColSpecs
         isempty(disallowed_chars) || return "disallowed characters $(disallowed_chars) in '$line'"
     end
     return nothing
+end
+
+struct ReadOptions
+    frs::FilterRowsSpec
+    colspecs::Union{ColSpecs,Vector{<:ColSpecs}}
+    restrictions::Restrictions
+    strip_chars::Vector{Char}
+    missings::Vector{String}
 end
 
 

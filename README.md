@@ -1,6 +1,6 @@
 # FixedWidthTables.jl
 
-Read fixed width tables. Wide range of format specification options, including autodetection.
+Read fixed width (so-called ASCII) tables. A wide range of format specification options, including autodetection.
 
 Basic usage:
 ```julia
