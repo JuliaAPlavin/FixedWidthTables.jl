@@ -2,6 +2,7 @@ module FixedWidthTables
 
 using DataPipes
 using StructArrays
+using AccessorsExtra  # for Dictionaries support
 
 
 convert_val(::Type{AbstractString},     val::AbstractString) = val  # e.g. SubString in case it is needed as-is
@@ -19,6 +20,10 @@ test_match(target::Char,   s::Char) = s == target
 test_match(target::Vector{Char},   s::Char) = s ∈ target
 
 
+"""
+    read(io, [sink=StructArray], colspecs::Union{NamedTuple, Dictionary}; skiprows=Int[], skiprows_startwith=String[], missings=String[], strip_chars=[' '], allow_shorter_lines=false, allow_overlap=false, restrict_remaining_chars=nothing)
+    read(io, [sink=StructArray]; headerrow::Union{Int, AbstractString}, skiprows=Int[], skiprows_startwith=String[], missings=String[], delim=' ')
+"""
 function read end
 
 read(io, colspecs; kwargs...) = read(io, StructArray, colspecs; kwargs...)
@@ -85,53 +90,40 @@ function read(io, sink::Type;
     end
     colspecs = ColSpecs(_colspecs_from_pairs(sink, colspecs); allow_overlap=false)
 
-    rows = @p let 
-        ixlines
-        filter!(((i,l),) -> i != headerrow)
-        Iterators.map() do (i, line)
-            process_line(i, line, colspecs, restrictions; strip_chars=delim, missings)
-        end
-    end
+    filter!(((i,l),) -> i != headerrow, ixlines)
     cols = map(T -> T[], spec_types(colspecs))
-    cols = materialize!(cols, Iterators.Stateful(rows))
+    cols = materialize!(cols, Iterators.Stateful(ixlines); colspecs, restrictions, strip_chars=delim, missings)
     return sink(cols)
 end
 
 function read(io, sink, colspecs;
         skiprows=Int[], skiprows_startwith=String[], missings=String[], strip_chars=[' '],
         allow_shorter_lines=false, allow_overlap=false, restrict_remaining_chars=nothing)
-    frs = FilterRowsSpec(skip_indices=skiprows, pred=line -> !any(startswith.(line, skiprows_startwith)))
+    frs = FilterRowsSpec(skip_indices=skiprows, pred=line -> !any(sw -> startswith(line, sw), skiprows_startwith))
     colspecs = ColSpecs(colspecs; allow_overlap)
     restrictions = Restrictions(;
         allow_shorter_lines,
         restrict_unused_chars=isnothing(restrict_remaining_chars) ? Returns(true) : ∈(restrict_remaining_chars),
     )
-    options = ReadOptions(frs, colspecs, restrictions, strip_chars, missings)
     cols = map(T -> T[], spec_types(colspecs))
-    cols = materialize!(cols, rowiterator(io, options))
+    cols = materialize!(cols, ixlineiterator(io, frs); colspecs, restrictions, strip_chars, missings)
     return sink(cols)
 end
 
-function materialize!(cols, rows, state=nothing)
-    for row in rows
-        newcols = _pushrow!!(cols, row)
+function materialize!(cols, ixlines; colspecs, restrictions, kwargs...)
+    for (i, line) in ixlines
+        newcols = try
+            _push_row_from_line!(cols, line, colspecs, restrictions; kwargs...)
+        catch e
+            rethrow(ErrorException("Error on line $i: '$line' \n$e"))
+        end
         if newcols !== cols
-            return materialize!(newcols, rows)
+            return materialize!(newcols, ixlines; colspecs, restrictions, kwargs...)
         end
     end
     return cols
 end
 
-_pushrow!!(cols, row) = map(_push!!, cols, row)
-_push!!(col::AbstractVector{T}, val::T) where {T} = push!(col, val)
-_push!!(col::AbstractVector{T}, val::Union{T, Missing}) where {T} = push!(convert(AbstractVector{Union{T,Missing}}, col), val)
-
-rowiterator(io, o) = @p let
-    ixlineiterator(io, o.frs)
-    Iterators.map() do (i, line)
-        process_line(i, line, o.colspecs, o.restrictions; o.strip_chars, o.missings)
-    end
-end
 
 _colspecs_from_pairs(::Type{StructArray}, pairs) = (; pairs...)
 
@@ -175,16 +167,6 @@ end
 
 ColSpecs(specs::AbstractVector; allow_overlap::Bool) = ColSpecs.(specs; allow_overlap)
 
-function parse_row(line::AbstractString, cs::ColSpecs; strip_chars, missings)
-    map(cs.char_rngs, cs.types) do rng, typ
-        @assert step(rng) == 1
-        s_val = line[rng.start:min(end, rng.stop)]
-        s_val = strip(s_val, strip_chars)
-        is_miss = any(ms -> test_match(ms, s_val), missings)
-        f_val = is_miss ? missing : convert_val(typ, s_val)
-    end
-end
-
 
 Base.@kwdef struct Restrictions{TP}
     allow_shorter_lines::Bool
@@ -203,43 +185,53 @@ function check_restrictions(line::AbstractString, rs::Restrictions, cs::ColSpecs
     return nothing
 end
 
-struct ReadOptions
-    frs::FilterRowsSpec
-    colspecs::Union{ColSpecs,Vector{<:ColSpecs}}
-    restrictions::Restrictions
-    strip_chars::Vector{Char}
-    missings::Vector{String}
-end
 
-
-function process_line(i::Int, line::AbstractString, cs::ColSpecs, rs::Restrictions; strip_chars, missings)
+function _push_row_from_line!(cols, line::AbstractString, cs::ColSpecs, rs::Restrictions; kwargs...)
     cr = check_restrictions(line, rs, cs)
     if !isnothing(cr)
-        throw(ArgumentError("Line $i: " * cr))
+        throw(ArgumentError(cr))
     end
 
-    try
-        return parse_row(line, cs; strip_chars, missings)
-    catch e
-        rethrow(ErrorException("$e \n on line $i: '$line'"))
-    end
+    parse_row!(cols, line, cs; kwargs...)
 end
 
-function process_line(i::Int, line::AbstractString, cses::Vector{<:ColSpecs}, rs::Restrictions; strip_chars, missings)
+function _push_row_from_line!(cols, line::AbstractString, cses::Vector{<:ColSpecs}, rs::Restrictions; kwargs...)
     for (j, cs) in cses |> enumerate
         cr = check_restrictions(line, rs, cs)
         if !isnothing(cr)
             j == lastindex(cses) ?
-                throw(ArgumentError("Line $i: " * cr)) :
+                throw(ArgumentError(cr)) :
                 continue
         end
 
-        try
-            return parse_row(line, cs; strip_chars, missings)
-        catch e
-            rethrow(ErrorException("$e \n on line $i: '$line'"))
-        end
+        return parse_row!(cols, line, cs; kwargs...)
     end
 end
+
+
+function parse_row!(cols, line::AbstractString, cs::ColSpecs; strip_chars, missings, lastk=nothing)
+    skipped = lastk === nothing
+    for (k, col, rng, typ) in zip(keys(cols), cols, cs.char_rngs, cs.types)
+        if !skipped
+            if k == lastk
+                skipped = true
+            end
+            continue
+        end
+        s_val_ = @view line[rng.start:min(end, rng.stop)]
+        s_val = strip(s_val_, strip_chars)
+        is_miss = any(ms -> test_match(ms, s_val), missings)
+        f_val = is_miss ? missing : convert_val(typ, s_val)
+        newcol = _push!!(col, f_val)
+        if newcol !== col
+            return parse_row!((@set cols[k] = newcol), line, cs; strip_chars, missings, lastk=k)
+        end
+    end
+    return cols
+end
+
+
+_push!!(col::AbstractVector{T}, val::T) where {T} = push!(col, val)
+_push!!(col::AbstractVector{T}, val::Union{T, Missing}) where {T} = push!(convert(AbstractVector{Union{T,Missing}}, col), val)
 
 end
