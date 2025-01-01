@@ -27,9 +27,22 @@ using TestItemRunner
     ))
     @test length(a) == 73
     @test length(unique(a)) == 73
-    @test isequal(a[1], (cat = 'N', name = "2357-141", cnt = 17, s_flux=missing))
-    @test isequal(a.s_flux, [missing, missing, missing, missing, missing, 0.569, 0.115, missing, 0.035, missing, 0.842, 0.327, missing, 0.149, missing, 0.319, missing, missing, missing, 0.204, missing, missing, missing, 0.018, missing, missing, missing, 0.009, missing, missing, missing, missing, missing, missing, missing, 0.056, 0.006, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, 0.227, 0.183, 0.164, missing, 0.203, missing, missing, 0.07, missing, missing, missing, 0.297, missing, missing, missing, missing, missing, missing, 0.633, missing, missing, missing, missing])
+    @test isequal(a[1], (cat = 'N', name = "2357-141", cnt = 17, s_flux=1.0))
+    @test isequal(a.s_flux, [1.0, missing, missing, missing, missing, 0.569, 0.115, missing, 0.035, missing, 0.842, 0.327, missing, 0.149, missing, 0.319, missing, missing, missing, 0.204, missing, missing, missing, 0.018, missing, missing, missing, 0.009, missing, missing, missing, missing, missing, missing, missing, 0.056, 0.006, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, 0.227, 0.183, 0.164, missing, 0.203, missing, missing, 0.07, missing, missing, missing, 0.297, missing, missing, missing, missing, missing, missing, 0.633, missing, missing, missing, missing])
     @test eltype(a) == @NamedTuple{cat::Char, name::String, cnt::Int, s_flux::Union{Float64, Missing}}
+
+    b = FWT.read(joinpath(@__DIR__, "rfc_2020b_cat.txt"),
+        (
+            cat = (1:1, Char),
+            name = (4:11, String),
+            cnt = (80:85, Int),
+            s_flux = (88:93, Float64),
+        ),
+        allow_shorter_lines=true, skiprows=1:131, missings=["-1.00"],
+    )
+    @test length(b) == 73
+    @test length(unique(b)) == 73
+    @test isequal(a, b)
 end
 
 
@@ -49,8 +62,8 @@ end
     )
     @test length(a) == 73
     @test length(unique(collect(a))) == 73
-    @test isequal(a[1], dictionary([:cat => 'N', :name => "2357-141", :cnt => 17, :s_flux => missing]))
-    @test isequal(a.s_flux, [missing, missing, missing, missing, missing, 0.569, 0.115, missing, 0.035, missing, 0.842, 0.327, missing, 0.149, missing, 0.319, missing, missing, missing, 0.204, missing, missing, missing, 0.018, missing, missing, missing, 0.009, missing, missing, missing, missing, missing, missing, missing, 0.056, 0.006, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, 0.227, 0.183, 0.164, missing, 0.203, missing, missing, 0.07, missing, missing, missing, 0.297, missing, missing, missing, missing, missing, missing, 0.633, missing, missing, missing, missing])
+    @test isequal(a[1], dictionary([:cat => 'N', :name => "2357-141", :cnt => 17, :s_flux => 1.0]))
+    @test isequal(a.s_flux, [1.0, missing, missing, missing, missing, 0.569, 0.115, missing, 0.035, missing, 0.842, 0.327, missing, 0.149, missing, 0.319, missing, missing, missing, 0.204, missing, missing, missing, 0.018, missing, missing, missing, 0.009, missing, missing, missing, missing, missing, missing, missing, 0.056, 0.006, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, missing, 0.227, 0.183, 0.164, missing, 0.203, missing, missing, 0.07, missing, missing, missing, 0.297, missing, missing, missing, missing, missing, missing, 0.633, missing, missing, missing, missing])
     @test eltype(a) <: AbstractDictionary{Symbol}
 end
 

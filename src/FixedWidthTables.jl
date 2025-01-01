@@ -135,7 +135,7 @@ end
 ixlineiterator(io, frs::FilterRowsSpec) =
     Iterators.filter(enumerate(eachline(io))) do (i, line)
         i ∉ frs.skip_indices && frs.pred(line)
-    end
+    end |> Iterators.Stateful
 
 Base.@kwdef struct ColSpecs{TR, TT}
     char_rngs::TR
