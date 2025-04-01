@@ -1,7 +1,7 @@
 name = "FixedWidthTables"
 uuid = "ef6c9296-b25d-482c-a0a7-898918678e13"
 authors = ["Alexander Plavin <alexander@plav.in>"]
-version = "0.2.2"
+version = "0.2.3"
 
 [deps]
 AccessorsExtra = "33016aad-b69d-45be-9359-82a41f556fd4"
@@ -18,5 +18,5 @@ DictArraysExt = "DictArrays"
 AccessorsExtra = "0.1.50"
 DataPipes = "0.3"
 DictArrays = "0.1.1"
-StructArrays = "0.6.8"
+StructArrays = "0.6.8, 0.7.1"
 julia = "1.5"
